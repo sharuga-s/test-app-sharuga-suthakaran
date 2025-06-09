@@ -1,6 +1,6 @@
 import {Modal, TextField} from '@shopify/polaris';
 import {useState} from 'react';
-import {BlockStack} from '~/components/Layout/BlockStack';
+import {BlockStack} from '../../../../components/Layout/BlockStack';
 
 interface CreateFeedModalProps {
   open: boolean;

@@ -1,23 +1,10 @@
-import {IndexTable, type IndexTableRowProps} from '@shopify/polaris';
+import {IndexTable} from '@shopify/polaris';
+import React from 'react';
 
-interface Props
-  extends Pick<
-    IndexTableRowProps,
-    'rowType' | 'position' | 'id' | 'children' | 'tone' | 'selected'
-  > {}
+type IndexTableRowProps = React.ComponentProps<typeof IndexTable.Row>;
 
-function Row({children, id, position, rowType, tone, selected}: Props) {
-  return (
-    <IndexTable.Row
-      id={id}
-      position={position}
-      rowType={rowType}
-      tone={tone}
-      selected={selected}
-    >
-      {children}
-    </IndexTable.Row>
-  );
+interface Props extends Pick<IndexTableRowProps, 'children' | 'id' | 'position' | 'selected' | 'tone'> {}
+
+export function Row({children, ...props}: Props) {
+  return <IndexTable.Row {...props}>{children}</IndexTable.Row>;
 }
-
-export {Row};

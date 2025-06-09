@@ -1,6 +1,6 @@
 import {Button, Collapsible} from '@shopify/polaris';
 import {useCallback, useState} from 'react';
-import {Cell} from '~/components/IndexTable/Cell';
+import {Cell} from '../../../components/IndexTable/Cell';
 
 interface Props {
   payload: string;

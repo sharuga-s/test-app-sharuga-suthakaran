@@ -1,9 +1,9 @@
 import {LoaderFunctionArgs} from '@remix-run/node';
 import {useLoaderData} from '@remix-run/react';
 import {IndexTable, Page} from '@shopify/polaris';
-import {Cell} from '~/components/IndexTable/Cell';
-import {Row} from '~/components/IndexTable/Row';
-import {authenticate} from '~/shopify.server';
+import {Cell} from '../../components/IndexTable/Cell';
+import {Row} from '../../components/IndexTable/Row';
+import {authenticate} from '../../shopify.server';
 import db from '../../db.server';
 import {IndexFilter} from './components/IndexFilter';
 import {PayloadCell} from './components/PayloadCell';

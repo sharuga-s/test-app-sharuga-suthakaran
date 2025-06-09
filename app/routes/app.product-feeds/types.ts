@@ -5,3 +5,6 @@ export interface ProductFeed {
   channelId: string;
   status: string;
 }
+
+// Alias for backward compatibility
+export type Feed = ProductFeed;

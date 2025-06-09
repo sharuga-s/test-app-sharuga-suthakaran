@@ -1,22 +1,14 @@
-import type {TextProps} from '@shopify/polaris';
-import type {ReactNode} from 'react';
-import {BaseMd} from './Base';
+import {Text} from '@shopify/polaris';
+import React from 'react';
 
-interface Props {
-  children: ReactNode;
-  as: Extract<TextProps['as'], 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'>;
+interface HeadingProps {
+  children: React.ReactNode;
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
-function Heading({children, as}: Props) {
-  return <BaseMd as={as}>{children}</BaseMd>;
+export function Heading({children, level = 2}: HeadingProps) {
+  const as = `h${level}` as const;
+  const variant = level <= 2 ? 'headingLg' : level <= 4 ? 'headingMd' : 'headingSm';
+  
+  return <Text variant={variant} as={as}>{children}</Text>;
 }
-
-function HeadingSecondary({children, as}: Props) {
-  return (
-    <BaseMd as={as} tone="subdued">
-      {children}
-    </BaseMd>
-  );
-}
-
-export {Heading, HeadingSecondary};

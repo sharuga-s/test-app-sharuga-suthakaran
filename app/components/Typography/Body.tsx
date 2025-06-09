@@ -1,30 +1,14 @@
-import type {TextProps} from '@shopify/polaris';
-import type {ReactNode} from 'react';
-import {Base, BaseMd} from './Base';
+import {Text} from '@shopify/polaris';
+import React from 'react';
 
-interface Props {
-  children: ReactNode;
-  as: Extract<TextProps['as'], 'p' | 'span' | 'strong' | 'legend'>;
+interface BodyProps {
+  children: React.ReactNode;
 }
 
-function Body({children, as}: Props) {
-  return <Base as={as}>{children}</Base>;
+export function Body({children}: BodyProps) {
+  return <Text variant="bodyMd" as="p">{children}</Text>;
 }
 
-function BodySecondary({children, as}: Props) {
-  return (
-    <Base tone="subdued" as={as}>
-      {children}
-    </Base>
-  );
+export function BodySecondary({children}: BodyProps) {
+  return <Text variant="bodySm" as="p" tone="subdued">{children}</Text>;
 }
-
-function BodyMdSecondary({children, as}: Props) {
-  return (
-    <BaseMd tone="subdued" as={as}>
-      {children}
-    </BaseMd>
-  );
-}
-
-export {Body, BodyMdSecondary, BodySecondary};

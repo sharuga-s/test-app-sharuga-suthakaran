@@ -1,6 +1,5 @@
 import {useFetcher} from '@remix-run/react';
 import {useCallback} from 'react';
-import type {Feed} from '../types';
 
 export function useFeeds() {
   const fetcher = useFetcher();
