@@ -32,11 +32,6 @@ export async function action({request}: ActionFunctionArgs) {
     });
     return json((await response.json()).data.productFeedDelete);
   }
-  const formatChannelId = (channelId: string) => {
-    if (channelId === '') return '';
-    if (channelId.includes('gid://shopify/Publication/')) return channelId;
-    return `gid://shopify/Publication/${channelId}`;
-  };
 
   try {
     const response = await admin.graphql(CREATE_PRODUCT_FEED, {
@@ -44,11 +39,6 @@ export async function action({request}: ActionFunctionArgs) {
         input: {
           country: formData.get('country')?.toString().toUpperCase(),
           language: formData.get('language')?.toString().toUpperCase(),
-          ...(formData.get('channelId') && {
-            channelId: formatChannelId(
-              formData.get('channelId')?.toString() || '',
-            ),
-          }),
         },
       },
     });

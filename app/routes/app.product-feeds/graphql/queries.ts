@@ -6,7 +6,6 @@ export const GET_PRODUCT_FEEDS = `
           id
           country
           language
-          channelId
           status
         }
       }
@@ -21,7 +20,6 @@ export const CREATE_PRODUCT_FEED = `
         id
         country
         language
-        channelId
         status
       }
       userErrors {

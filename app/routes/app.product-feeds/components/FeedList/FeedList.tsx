@@ -48,8 +48,8 @@ export function FeedList() {
   }, [fetcher.data, navigate]);
 
   const handleCreateFeed = useCallback(
-    (country: string, language: string, channelId: string) => {
-      fetcher.submit({country, language, channelId}, {method: 'POST'});
+    (country: string, language: string) => {
+      fetcher.submit({country, language}, {method: 'POST'});
     },
     [fetcher],
   );

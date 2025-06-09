@@ -5,7 +5,7 @@ import {BlockStack} from '../../../../components/Layout/BlockStack';
 interface CreateFeedModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (country: string, language: string, channelId: string) => void;
+  onSubmit: (country: string, language: string) => void;
 }
 
 export function CreateFeedModal({
@@ -15,13 +15,11 @@ export function CreateFeedModal({
 }: CreateFeedModalProps) {
   const [country, setCountry] = useState('');
   const [language, setLanguage] = useState('');
-  const [channelId, setChannelId] = useState('');
 
   const handleSubmit = () => {
-    onSubmit(country, language, channelId);
+    onSubmit(country, language);
     setCountry('');
     setLanguage('');
-    setChannelId('');
   };
 
   return (
@@ -55,13 +53,6 @@ export function CreateFeedModal({
             onChange={setLanguage}
             autoComplete="off"
             helpText="Language code (e.g., EN, FR)"
-          />
-          <TextField
-            label="Channel ID"
-            value={channelId}
-            onChange={setChannelId}
-            autoComplete="off"
-            helpText="Channel to create the feed for"
           />
         </BlockStack>
       </Modal.Section>

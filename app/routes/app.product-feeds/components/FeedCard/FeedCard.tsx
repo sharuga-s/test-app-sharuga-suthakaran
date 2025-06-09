@@ -17,7 +17,6 @@ export function FeedCard({feed, onDelete}: FeedCardProps) {
         <Body>Country: {feed.country}</Body>
         <Body>Language: {feed.language}</Body>
         <Body>Status: {feed.status}</Body>
-        <Body>Channel ID: {feed.channelId}</Body>
         <BodySecondary>ID: {feed.id}</BodySecondary>
         <Button tone="critical" onClick={onDelete}>
           Delete Feed
