@@ -4,21 +4,15 @@ import { useLoaderData } from '@remix-run/react';
 import { Card, Page, Text } from '@shopify/polaris';
 import { authenticate } from '../shopify.server';
 
-const TEST_FEED_QUERY = `
-  query GetProductFeed($id: ID!) {
-    productFeed(id: $id) {
-      id
-      country
-      language
-      status
-      products(first: 5) {
-        edges {
-          node {
-            id
-            title
-            handle
-            status
-          }
+const GET_ALL_FEEDS_QUERY = `
+  query GetAllProductFeeds {
+    productFeeds(first: 10) {
+      edges {
+        node {
+          id
+          country
+          language
+          status
         }
       }
     }
@@ -29,14 +23,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { admin } = await authenticate.admin(request);
   
   try {
-    const response = await admin.graphql(TEST_FEED_QUERY, {
-      variables: {
-        id: "gid://shopify/ProductFeed/9464381462" // Your feed ID
-      }
-    });
-    
+    const response = await admin.graphql(GET_ALL_FEEDS_QUERY);
     const data = await response.json();
-    return json({ feedData: data.data.productFeed, error: null });
+    
+    if (!data.data || !data.data.productFeeds) {
+      return json({ 
+        feedData: null, 
+        error: 'No product feeds data found in response' 
+      });
+    }
+    
+    return json({ 
+      feedData: data.data.productFeeds.edges, 
+      error: null 
+    });
   } catch (error) {
     return json({ feedData: null, error: String(error) });
   }
@@ -49,27 +49,33 @@ export default function TestFeed() {
     <Page title="Product Feed Test">
       <Card>
         {error ? (
-          <Text as="p" tone="critical">Error: {error}</Text>
-        ) : feedData ? (
           <div>
-            <Text as="h2" variant="headingMd">✅ Feed is Working!</Text>
-            <p><strong>Feed ID:</strong> {feedData.id}</p>
-            <p><strong>Country:</strong> {feedData.country}</p>
-            <p><strong>Language:</strong> {feedData.language}</p>
-            <p><strong>Status:</strong> {feedData.status}</p>
-            <p><strong>Products in Feed:</strong> {feedData.products.edges.length}</p>
+            <Text as="h2" variant="headingMd" tone="critical">❌ Error Loading Feeds</Text>
+            <Text as="p" tone="critical">Error: {error}</Text>
+          </div>
+        ) : feedData && feedData.length > 0 ? (
+          <div>
+            <Text as="h2" variant="headingMd">✅ Product Feeds Found!</Text>
+            <Text as="p">Total feeds: {feedData.length}</Text>
             
-            <Text as="h3" variant="headingMd">Sample Products:</Text>
-            <ul>
-              {feedData.products.edges.map(({ node }: any) => (
-                <li key={node.id}>
-                  {node.title} (Handle: {node.handle}, Status: {node.status})
-                </li>
+            <div style={{marginTop: '1rem'}}>
+              <Text as="h3" variant="headingMd">Feed Details:</Text>
+              {feedData.map(({ node }: any, index: number) => (
+                <div key={node.id} style={{marginBottom: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '4px'}}>
+                  <Text as="h4" variant="headingSm">Feed #{index + 1}</Text>
+                  <p><strong>ID:</strong> {node.id}</p>
+                  <p><strong>Country:</strong> {node.country}</p>
+                  <p><strong>Language:</strong> {node.language}</p>
+                  <p><strong>Status:</strong> {node.status}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         ) : (
-          <Text as="p">No feed data found</Text>
+          <div>
+            <Text as="h2" variant="headingMd">📋 No Product Feeds Found</Text>
+            <Text as="p">No product feeds are currently configured for this store.</Text>
+          </div>
         )}
       </Card>
     </Page>
