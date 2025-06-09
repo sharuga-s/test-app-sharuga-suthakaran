@@ -1,4 +1,4 @@
-import {Button, Collapsible} from '@shopify/polaris';
+import {Button, Collapsible, Text} from '@shopify/polaris';
 import {useCallback, useState} from 'react';
 import {Cell} from '../../../components/IndexTable/Cell';
 
@@ -12,31 +12,65 @@ export function PayloadCell(props: Props) {
     setIsOpen((prevState) => !prevState);
   }, []);
 
-  const truncatePayload = (payload: string, length: number = 30) => {
-    return JSON.stringify(payload).length > length
-      ? JSON.stringify(payload).substring(0, length)
-      : JSON.stringify(payload);
+  const parsePayload = () => {
+    try {
+      return JSON.parse(props.payload);
+    } catch {
+      return props.payload;
+    }
   };
+
+  const formatPayload = (payload: any) => {
+    try {
+      return JSON.stringify(payload, null, 2);
+    } catch {
+      return String(payload);
+    }
+  };
+
+  const truncatePayload = (payload: string, length: number = 50) => {
+    return payload.length > length
+      ? payload.substring(0, length) + '...'
+      : payload;
+  };
+
+  const parsedPayload = parsePayload();
+  const formattedPayload = formatPayload(parsedPayload);
 
   return (
     <Cell>
-      {isOpen ? (
-        <Collapsible open={true} id={''}>
-          <pre>
-            {JSON.stringify(props.payload, null, 2)}
-            <Button variant="plain" onClick={handleToggle}>
-              {isOpen ? '<<' : '...'}
+      <div style={{ maxWidth: '300px' }}>
+        {isOpen ? (
+          <div>
+            <div style={{ 
+              maxHeight: '400px', 
+              overflow: 'auto', 
+              backgroundColor: '#f6f6f7', 
+              padding: '12px', 
+              borderRadius: '4px',
+              fontSize: '12px',
+              fontFamily: 'monospace'
+            }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+                {formattedPayload}
+              </pre>
+            </div>
+            <Button variant="plain" onClick={handleToggle} size="micro">
+              Show less
             </Button>
-          </pre>
-        </Collapsible>
-      ) : (
-        <pre>
-          {truncatePayload(props.payload)}
-          <Button variant="plain" onClick={handleToggle}>
-            {isOpen ? '<<' : '...'}
-          </Button>
-        </pre>
-      )}
+          </div>
+        ) : (
+          <div>
+            <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>
+              {truncatePayload(formattedPayload.replace(/\s+/g, ' '))}
+            </span>
+            <br />
+            <Button variant="plain" onClick={handleToggle} size="micro">
+              Show full payload
+            </Button>
+          </div>
+        )}
+      </div>
     </Cell>
   );
 }
