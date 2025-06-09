@@ -27,7 +27,7 @@ export function FeedList({ feeds }: FeedListProps) {
             <Text variant="bodyMd" fontWeight="bold" as="h3">
               {country}-{language}
             </Text>
-            <Text variant="bodySm" as="p" tone="subdued">
+            <Text variant="bodySm" tone="subdued" as="p">
               Feed ID: {id.split('/').pop()}
             </Text>
           </div>

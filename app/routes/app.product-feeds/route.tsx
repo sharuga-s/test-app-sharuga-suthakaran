@@ -50,9 +50,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const result = await feedResponse.json();
     return json({ success: true, data: result });
 
-  } catch (err: any) {
-    return json({ success: false, error: err.message });
+} catch (error: any) {
+    return json({ success: false, error: error.message });
   }
+  
 };
 
 export default function ProductFeeds() {
