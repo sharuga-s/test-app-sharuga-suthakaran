@@ -1,4 +1,6 @@
+import {TitleBar} from '@shopify/app-bridge-react';
 import {
+  BlockStack,
   Box,
   Card,
   Layout,
@@ -6,9 +8,7 @@ import {
   List,
   Page,
   Text,
-  BlockStack,
-} from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
+} from '@shopify/polaris';
 
 export default function AdditionalPage() {
   return (
@@ -21,7 +21,7 @@ export default function AdditionalPage() {
               <Text as="p" variant="bodyMd">
                 The app template comes with an additional page which
                 demonstrates how to create multiple pages within app navigation
-                using{" "}
+                using{' '}
                 <Link
                   url="https://shopify.dev/docs/apps/tools/app-bridge"
                   target="_blank"
@@ -65,7 +65,7 @@ export default function AdditionalPage() {
   );
 }
 
-function Code({ children }: { children: React.ReactNode }) {
+function Code({children}: {children: React.ReactNode}) {
   return (
     <Box
       as="span"

@@ -3,7 +3,7 @@
 client_id = "064330ac8f15b8c165d3ea3348bd76a5"
 name = "test-app-sharuga-suthakaran"
 handle = "test-app-sharuga-suthakaran"
-application_url = "https://out-austria-valley-labeled.trycloudflare.com"
+application_url = "https://strap-yo-terminals-specially.trycloudflare.com"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "read_product_listings,write_products"
 
 [auth]
 redirect_urls = [
-  "https://out-austria-valley-labeled.trycloudflare.com/auth/callback",
-  "https://out-austria-valley-labeled.trycloudflare.com/auth/shopify/callback",
-  "https://out-austria-valley-labeled.trycloudflare.com/api/auth/callback"
+  "https://strap-yo-terminals-specially.trycloudflare.com/auth/callback",
+  "https://strap-yo-terminals-specially.trycloudflare.com/auth/shopify/callback",
+  "https://strap-yo-terminals-specially.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

@@ -1,68 +1,100 @@
-import { Card, ResourceList, ResourceItem, Badge, Text } from "@shopify/polaris";
+import {useFetcher, useLoaderData, useNavigate} from '@remix-run/react';
+import {Banner, Button, Card, Layout} from '@shopify/polaris';
+import {useCallback, useEffect, useState} from 'react';
+import {BlockStack, BlockStackLoose} from '~/components/Layout/BlockStack';
+import type {ProductFeed} from '../../types';
+import {CreateFeedModal} from '../CreateFeedModal';
+import {FeedCard} from '../FeedCard';
 
-interface ProductFeed {
-  id: string;
-  country: string;
-  language: string;
-  status?: string;
-}
+type LoaderData = {
+  feeds: Array<{node: ProductFeed}>;
+};
 
-interface FeedListProps {
-  feeds: ProductFeed[];
-}
+export function FeedList() {
+  const {feeds} = useLoaderData<LoaderData>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
+  const fetcher = useFetcher();
+  const navigate = useNavigate();
 
-export function FeedList({ feeds }: FeedListProps) {
-  const renderFeedItem = (feed: ProductFeed) => {
-    const { id, country, language, status } = feed;
-    
-    return (
-      <ResourceItem
-        id={id}
-        onClick={() => {
-          console.log('Clicked feed:', id);
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <Text variant="bodyMd" fontWeight="bold" as="h3">
-              {country}-{language}
-            </Text>
-            <Text variant="bodySm" tone="subdued" as="p">
-              Feed ID: {id.split('/').pop()}
-            </Text>
-          </div>
-          <Badge tone={status === 'ACTIVE' ? 'success' : 'info'}>
-            {status || 'Active'}
-          </Badge>
-        </div>
-      </ResourceItem>
-    );
-  };
+  useEffect(() => {
+    // Handle success cases
+    if (fetcher.data?.productFeed || fetcher.data?.deletedId) {
+      setIsModalOpen(false);
+      navigate('.');
+    }
+
+    // Handle error case
+    if (
+      fetcher.data?.userErrors &&
+      !fetcher.data?.productFeed &&
+      !fetcher.data?.deletedId
+    ) {
+      setShowErrorBanner(true);
+      setIsModalOpen(false);
+
+      const timer = setTimeout(() => {
+        setShowErrorBanner(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [fetcher.data, navigate]);
+
+  const handleCreateFeed = useCallback(
+    (country: string, language: string, channelId: string) => {
+      fetcher.submit({country, language, channelId}, {method: 'POST'});
+    },
+    [fetcher],
+  );
+
+  const handleDeleteFeed = useCallback(
+    (feedId: string) => {
+      if (window.confirm('Are you sure you want to delete this feed?')) {
+        fetcher.submit({feedId}, {method: 'DELETE'});
+      }
+    },
+    [fetcher],
+  );
 
   return (
-    <Card>
-      <div style={{ padding: '1rem 0' }}>
-        <Text variant="headingMd" as="h2">
-          📡 Active Product Feeds
-        </Text>
-        <Text variant="bodySm" as="p" tone="subdued">
-          These feeds provide contextual product data to your sales channel
-        </Text>
-      </div>
-      
-      {feeds.length > 0 ? (
-        <ResourceList
-          resourceName={{ singular: 'feed', plural: 'feeds' }}
-          items={feeds}
-          renderItem={renderFeedItem}
-        />
-      ) : (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <Text variant="bodyMd" tone="subdued" as="p">
-            No product feeds found. Create one to get started!
-          </Text>
-        </div>
-      )}
-    </Card>
+    <Layout>
+      <Layout.Section>
+        <Card>
+          <BlockStackLoose>
+            <Button onClick={() => setIsModalOpen(true)}>
+              Create new feed
+            </Button>
+
+            {showErrorBanner &&
+              fetcher.data?.userErrors &&
+              !fetcher.data?.productFeed &&
+              !fetcher.data?.deletedId && (
+                <Banner status="critical">
+                  {fetcher.data.userErrors.map((error: {message: string}) => (
+                    <p key={error.message}>{error.message}</p>
+                  ))}
+                </Banner>
+              )}
+
+            <BlockStack>
+              {feeds.map(({node}) => (
+                <FeedCard
+                  key={node.id}
+                  feed={node}
+                  onDelete={() => handleDeleteFeed(node.id)}
+                />
+              ))}
+            </BlockStack>
+          </BlockStackLoose>
+        </Card>
+      </Layout.Section>
+
+      <CreateFeedModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateFeed}
+      />
+    </Layout>
   );
 }
