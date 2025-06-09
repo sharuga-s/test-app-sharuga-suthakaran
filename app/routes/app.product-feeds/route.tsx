@@ -5,7 +5,7 @@ import {
 } from '@remix-run/node';
 import {TitleBar} from '@shopify/app-bridge-react';
 import {Page} from '@shopify/polaris';
-import {authenticate} from '~/shopify.server';
+import {authenticate} from '../../shopify.server';
 import {FeedList} from './components/FeedList';
 import {
   CREATE_PRODUCT_FEED,
