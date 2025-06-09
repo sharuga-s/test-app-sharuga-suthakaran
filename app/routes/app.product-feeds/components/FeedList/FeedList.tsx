@@ -1,7 +1,7 @@
 import {useFetcher, useLoaderData, useNavigate} from '@remix-run/react';
 import {Banner, Button, Card, Layout} from '@shopify/polaris';
 import {useCallback, useEffect, useState} from 'react';
-import {BlockStack, BlockStackLoose} from '~/components/Layout/BlockStack';
+import {BlockStack, BlockStackLoose} from '../../../../components/Layout/BlockStack';
 import type {ProductFeed} from '../../types';
 import {CreateFeedModal} from '../CreateFeedModal';
 import {FeedCard} from '../FeedCard';
@@ -10,11 +10,17 @@ type LoaderData = {
   feeds: Array<{node: ProductFeed}>;
 };
 
+type FetcherData = {
+  productFeed?: ProductFeed;
+  deletedId?: string;
+  userErrors?: Array<{message: string}>;
+};
+
 export function FeedList() {
   const {feeds} = useLoaderData<LoaderData>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showErrorBanner, setShowErrorBanner] = useState(false);
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<FetcherData>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,7 +76,7 @@ export function FeedList() {
               fetcher.data?.userErrors &&
               !fetcher.data?.productFeed &&
               !fetcher.data?.deletedId && (
-                <Banner status="critical">
+                <Banner tone="critical">
                   {fetcher.data.userErrors.map((error: {message: string}) => (
                     <p key={error.message}>{error.message}</p>
                   ))}
