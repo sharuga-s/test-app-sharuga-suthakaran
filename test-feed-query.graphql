@@ -1,0 +1,28 @@
+query GetProductFeedData {
+  productFeed(id: "gid://shopify/ProductFeed/9464381462") {
+    id
+    country
+    language
+    status
+    products(first: 10) {
+      edges {
+        node {
+          id
+          title
+          handle
+          status
+          variants(first: 5) {
+            edges {
+              node {
+                id
+                title
+                price
+                availableForSale
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 
