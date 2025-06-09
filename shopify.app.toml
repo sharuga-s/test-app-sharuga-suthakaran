@@ -3,7 +3,7 @@
 client_id = "064330ac8f15b8c165d3ea3348bd76a5"
 name = "test-app-sharuga-suthakaran"
 handle = "test-app-sharuga-suthakaran"
-application_url = "https://strap-yo-terminals-specially.trycloudflare.com"
+application_url = "https://rent-ob-organ-angola.trycloudflare.com"
 embedded = true
 
 [build]
@@ -23,13 +23,13 @@ api_version = "2025-04"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products, read_products, read_publications, write_files, read_product_listings"
+scopes = "write_products, read_product_listings"
 
 [auth]
 redirect_urls = [
-  "https://strap-yo-terminals-specially.trycloudflare.com/auth/callback",
-  "https://strap-yo-terminals-specially.trycloudflare.com/auth/shopify/callback",
-  "https://strap-yo-terminals-specially.trycloudflare.com/api/auth/callback"
+  "https://rent-ob-organ-angola.trycloudflare.com/auth/callback",
+  "https://rent-ob-organ-angola.trycloudflare.com/auth/shopify/callback",
+  "https://rent-ob-organ-angola.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
