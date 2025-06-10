@@ -41,22 +41,27 @@ const GET_PRODUCTS_QUERY = `
 `;
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+  console.log('🔍 Products Route - Starting loader');
+  console.log('🔍 Products Route - Feed ID:', params.feedId);
+  console.log('🔍 Products Route - Full URL:', request.url);
+  
   const { admin } = await authenticate.admin(request);
   const feedId = params.feedId;
 
   if (!feedId) {
+    console.error('❌ No feed ID provided');
     throw new Response('Feed ID is required', { status: 400 });
   }
 
   try {
-    // For now, let's get all products and show them
-    // This is a simplified approach while we debug the productFeed query
+    console.log('📡 Making GraphQL request for products...');
     const response = await admin.graphql(GET_PRODUCTS_QUERY);
     const data = await response.json();
     
-    console.log('GraphQL Response:', JSON.stringify(data, null, 2));
+    console.log('✅ GraphQL Response received, products count:', data.data?.products?.edges?.length || 0);
     
     if (!data.data?.products) {
+      console.error('❌ No products data in response');
       return json({ 
         feed: { id: feedId, country: 'Unknown', language: 'Unknown', status: 'Unknown' },
         products: [], 
@@ -64,6 +69,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       });
     }
 
+    console.log('🎉 Successfully loaded products for feed:', feedId);
     return json({
       feed: { 
         id: `gid://shopify/ProductFeed/${feedId}`, 
@@ -75,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       error: null
     });
   } catch (error) {
-    console.error('Error loading products:', error);
+    console.error('💥 Error loading products:', error);
     return json({ 
       feed: { id: feedId, country: 'Unknown', language: 'Unknown', status: 'Unknown' },
       products: [], 
@@ -87,119 +93,134 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FeedProducts() {
   const { feed, products, error } = useLoaderData<typeof loader>();
 
-  if (error) {
-    return (
-      <Page 
-        title="Error Loading Products"
-        backAction={{ url: '/app/product-feeds' }}
-      >
+  return (
+    <Page 
+      title={`Products for ${feed.country}-${feed.language} Feed`}
+      subtitle={`Feed Status: ${feed.status}`}
+      backAction={{ url: '/app/product-feeds' }}
+    >
+      {/* Debug Information Card */}
+      <Card>
+        <div style={{ padding: '16px', backgroundColor: '#f6f6f7', marginBottom: '20px' }}>
+          <Text variant="headingMd" as="h3">🔍 Debug Information</Text>
+          <div style={{ marginTop: '12px' }}>
+            <Text variant="bodySm" as="p"><strong>Feed ID:</strong> {feed.id}</Text>
+            <Text variant="bodySm" as="p"><strong>Country:</strong> {feed.country}</Text>
+            <Text variant="bodySm" as="p"><strong>Language:</strong> {feed.language}</Text>
+            <Text variant="bodySm" as="p"><strong>Status:</strong> {feed.status}</Text>
+            <Text variant="bodySm" as="p"><strong>Products Found:</strong> {products.length}</Text>
+            {error && <Text variant="bodySm" as="p" tone="critical"><strong>Error:</strong> {error}</Text>}
+          </div>
+        </div>
+      </Card>
+
+      {/* Error Display */}
+      {error && (
         <Card>
           <div style={{ padding: '20px', textAlign: 'center' }}>
-            <Text variant="headingMd" as="h2" tone="critical">Error Loading Feed Products</Text>
+            <Text variant="headingMd" as="h2" tone="critical">❌ Error Loading Products</Text>
             <div style={{ marginTop: '12px' }}>
               <Text variant="bodyMd" as="p">{error}</Text>
             </div>
-            <div style={{ marginTop: '20px' }}>
-              <Text variant="bodySm" as="p" tone="subdued">
-                This might be because:
-              </Text>
-              <ul style={{ marginTop: '8px', textAlign: 'left', maxWidth: '400px', margin: '8px auto' }}>
-                <li>The product feed query is not supported in this Shopify version</li>
-                <li>The feed ID is incorrect</li>
-                <li>There are no products available</li>
-              </ul>
-            </div>
           </div>
         </Card>
-      </Page>
-    );
-  }
+      )}
 
-  const rowMarkup = products.map(({ node: product }: any, index: number) => (
-    <IndexTable.Row id={product.id} key={product.id} position={index}>
-      <IndexTable.Cell>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {product.featuredImage && (
-            <img 
-              src={product.featuredImage.url} 
-              alt={product.featuredImage.altText || product.title}
-              style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
-            />
-          )}
-          <div>
-            <Text variant="bodyMd" fontWeight="semibold" as="p">{product.title}</Text>
-            <Text variant="bodySm" tone="subdued" as="p">{product.handle}</Text>
-          </div>
-        </div>
-      </IndexTable.Cell>
-      <IndexTable.Cell>
-        <Badge tone={product.status === 'ACTIVE' ? 'success' : 'info'}>
-          {product.status}
-        </Badge>
-      </IndexTable.Cell>
-      <IndexTable.Cell>
-        <Text variant="bodySm" as="p">{product.vendor || 'No vendor'}</Text>
-      </IndexTable.Cell>
-      <IndexTable.Cell>
-        <Text variant="bodySm" as="p">{product.productType || 'No type'}</Text>
-      </IndexTable.Cell>
-      <IndexTable.Cell>
-        {product.variants.edges.length > 0 && (
-          <div>
-            <Text variant="bodySm" as="p">
-              ${product.variants.edges[0].node.price}
-            </Text>
-            {product.variants.edges.length > 1 && (
-              <Text variant="bodySm" tone="subdued" as="p">
-                +{product.variants.edges.length - 1} more
-              </Text>
-            )}
-          </div>
-        )}
-      </IndexTable.Cell>
-      <IndexTable.Cell>
-        {product.variants.edges.length > 0 && (
-          <Badge tone={product.variants.edges[0].node.availableForSale ? 'success' : 'critical'}>
-            {product.variants.edges[0].node.availableForSale ? 'Available' : 'Unavailable'}
-          </Badge>
-        )}
-      </IndexTable.Cell>
-    </IndexTable.Row>
-  ));
-
-  return (
-    <Page 
-      title={`Products Available for ${feed.country}-${feed.language} Feed`}
-      subtitle={`Feed Status: ${feed.status} • Showing available products`}
-      backAction={{ url: '/app/product-feeds' }}
-    >
+      {/* Products Display */}
       <Card>
-        {products.length > 0 ? (
-          <IndexTable
-            resourceName={{
-              singular: 'product',
-              plural: 'products',
-            }}
-            itemCount={products.length}
-            headings={[
-              { title: 'Product' },
-              { title: 'Status' },
-              { title: 'Vendor' },
-              { title: 'Type' },
-              { title: 'Price' },
-              { title: 'Availability' },
-            ]}
-          >
-            {rowMarkup}
-          </IndexTable>
-        ) : (
-          <EmptyState
-            heading="No products available"
-            image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-          >
-            <p>No products are currently available in your store. Add some products to see them here!</p>
-          </EmptyState>
-        )}
+        <div style={{ padding: '16px' }}>
+          <Text variant="headingMd" as="h2">📦 Products</Text>
+          
+          {products.length > 0 ? (
+            <div style={{ marginTop: '16px' }}>
+              <Text variant="bodyMd" as="p" tone="success">
+                ✅ Found {products.length} products in your store!
+              </Text>
+              
+              <IndexTable
+                resourceName={{
+                  singular: 'product',
+                  plural: 'products',
+                }}
+                itemCount={products.length}
+                headings={[
+                  { title: 'Product' },
+                  { title: 'Status' },
+                  { title: 'Vendor' },
+                  { title: 'Type' },
+                  { title: 'Price' },
+                  { title: 'Availability' },
+                ]}
+              >
+                {products.map(({ node: product }: any, index: number) => (
+                  <IndexTable.Row id={product.id} key={product.id} position={index}>
+                    <IndexTable.Cell>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {product.featuredImage && (
+                          <img 
+                            src={product.featuredImage.url} 
+                            alt={product.featuredImage.altText || product.title}
+                            style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                          />
+                        )}
+                        <div>
+                          <Text variant="bodyMd" fontWeight="semibold" as="p">{product.title}</Text>
+                          <Text variant="bodySm" tone="subdued" as="p">{product.handle}</Text>
+                        </div>
+                      </div>
+                    </IndexTable.Cell>
+                    <IndexTable.Cell>
+                      <Badge tone={product.status === 'ACTIVE' ? 'success' : 'info'}>
+                        {product.status}
+                      </Badge>
+                    </IndexTable.Cell>
+                    <IndexTable.Cell>
+                      <Text variant="bodySm" as="p">{product.vendor || 'No vendor'}</Text>
+                    </IndexTable.Cell>
+                    <IndexTable.Cell>
+                      <Text variant="bodySm" as="p">{product.productType || 'No type'}</Text>
+                    </IndexTable.Cell>
+                    <IndexTable.Cell>
+                      {product.variants.edges.length > 0 && (
+                        <div>
+                          <Text variant="bodySm" as="p">
+                            ${product.variants.edges[0].node.price}
+                          </Text>
+                          {product.variants.edges.length > 1 && (
+                            <Text variant="bodySm" tone="subdued" as="p">
+                              +{product.variants.edges.length - 1} more
+                            </Text>
+                          )}
+                        </div>
+                      )}
+                    </IndexTable.Cell>
+                    <IndexTable.Cell>
+                      {product.variants.edges.length > 0 && (
+                        <Badge tone={product.variants.edges[0].node.availableForSale ? 'success' : 'critical'}>
+                          {product.variants.edges[0].node.availableForSale ? 'Available' : 'Unavailable'}
+                        </Badge>
+                      )}
+                    </IndexTable.Cell>
+                  </IndexTable.Row>
+                ))}
+              </IndexTable>
+            </div>
+          ) : (
+            <div style={{ marginTop: '16px', textAlign: 'center', padding: '40px' }}>
+              <Text variant="headingMd" as="h3">📭 No Products Found</Text>
+              <div style={{ marginTop: '12px' }}>
+                <Text variant="bodyMd" as="p">
+                  No products are currently available in your store.
+                </Text>
+                <div style={{ marginTop: '8px' }}>
+                  <Text variant="bodySm" as="p" tone="subdued">
+                    Try adding some products to your Shopify store and refresh this page.
+                  </Text>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
     </Page>
   );
