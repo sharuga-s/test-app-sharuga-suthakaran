@@ -1,4 +1,5 @@
 import {Button, Card} from '@shopify/polaris';
+import {useNavigate} from '@remix-run/react';
 import {BlockStackTight} from '../../../../components/Layout/BlockStack';
 import {Body, BodySecondary} from '../../../../components/Typography/Body';
 import {Heading} from '../../../../components/Typography/Headings';
@@ -10,7 +11,14 @@ interface FeedCardProps {
 }
 
 export function FeedCard({feed, onDelete}: FeedCardProps) {
+  const navigate = useNavigate();
   const feedIdNumber = feed.id.split('/').pop(); // Extract just the number from gid://shopify/ProductFeed/123
+
+  const handleViewProducts = () => {
+    const productsUrl = `/app/product-feeds/products/${feedIdNumber}`;
+    console.log('Navigating to:', productsUrl); // Debug log
+    navigate(productsUrl);
+  };
 
   return (
     <Card>
@@ -20,9 +28,10 @@ export function FeedCard({feed, onDelete}: FeedCardProps) {
         <Body>Language: {feed.language}</Body>
         <Body>Status: {feed.status}</Body>
         <BodySecondary>ID: {feed.id}</BodySecondary>
+        <BodySecondary>Debug - Feed ID Number: {feedIdNumber}</BodySecondary>
         <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
           <Button 
-            url={`/app/product-feeds/products/${feedIdNumber}`}
+            onClick={handleViewProducts}
             variant="primary"
           >
             View Products
