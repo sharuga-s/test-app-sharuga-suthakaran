@@ -3,7 +3,7 @@
 client_id = "064330ac8f15b8c165d3ea3348bd76a5"
 name = "test-app-sharuga-suthakaran"
 handle = "test-app-sharuga-suthakaran"
-application_url = "https://sender-hourly-gdp-studies.trycloudflare.com"
+application_url = "https://testimony-movies-mother-per.trycloudflare.com"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "write_products, read_product_listings"
 
 [auth]
 redirect_urls = [
-  "https://sender-hourly-gdp-studies.trycloudflare.com/auth/callback",
-  "https://sender-hourly-gdp-studies.trycloudflare.com/auth/shopify/callback",
-  "https://sender-hourly-gdp-studies.trycloudflare.com/api/auth/callback"
+  "https://testimony-movies-mother-per.trycloudflare.com/auth/callback",
+  "https://testimony-movies-mother-per.trycloudflare.com/auth/shopify/callback",
+  "https://testimony-movies-mother-per.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

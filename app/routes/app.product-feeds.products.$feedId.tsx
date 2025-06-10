@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { Card, Page, IndexTable, Text, Badge, EmptyState } from '@shopify/polaris';
-import { authenticate } from '../../shopify.server';
+import { authenticate } from '../shopify.server';
 
 // Simplified query to get products and check if they're in the feed
 const GET_PRODUCTS_QUERY = `
